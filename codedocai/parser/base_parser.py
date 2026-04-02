@@ -23,11 +23,13 @@ def get_parser(language: str) -> AbstractParser:
     """Factory: return the right parser for a language string."""
     from codedocai.parser.python_parser import PythonParser
     from codedocai.parser.js_parser import JSParser
+    from codedocai.parser.rust_parser import RustParser
 
     _registry: dict[str, AbstractParser] = {
         "python": PythonParser(),
         "javascript": JSParser(),
         "typescript": JSParser(),  # same parser handles both
+        "rust": RustParser(),
     }
     parser = _registry.get(language)
     if parser is None:

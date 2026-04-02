@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env/
+*.venv/
+venv/
+env/
+pip-log.txt
+*.egg-info/
+dist/
+build/
+
+# Node / JavaScript / TypeScript
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+*.tsbuildinfo
+
+# Rust
+target/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Generated Docs (optional: tu peux versionner si tu veux)
+docs/

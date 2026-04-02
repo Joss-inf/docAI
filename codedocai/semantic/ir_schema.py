@@ -55,6 +55,14 @@ class FunctionIR(BaseModel):
     decorators: list[str] = Field(default_factory=list)
     docstring: Optional[str] = None
     calls: list[str] = Field(default_factory=list)
+    reads: list[str] = Field(default_factory=list)
+    writes: list[str] = Field(default_factory=list)
+    io_operations: list[str] = Field(default_factory=list)
+    mutates_state: bool = False
+    has_io: bool = False
+    network_access: bool = False
+    db_access: bool = False
+    criticality: str = "LOW"
     side_effects: list[SideEffect] = Field(default_factory=list)
     is_async: bool = False
     line_start: int = 0
@@ -91,6 +99,7 @@ class FileIR(BaseModel):
     role: ModuleRole = ModuleRole.GENERIC
     criticality: float = 0.0
     summary: Optional[str] = None  # Filled by LLM later
+    file_hash: Optional[str] = None  # Added for caching
 
 
 class ProjectIR(BaseModel):

@@ -108,10 +108,11 @@ class JSParser(AbstractParser):
             for p in raw_params.split(",")
             if p.strip()
         ]
+        raw_ret = m.groupdict().get("ret")
         return FunctionIR(
             name=m.group("name"),
             params=params,
             is_async=bool(m.group("async")),
-            return_type=m.groupdict().get("ret", "").strip() or None,
+            return_type=raw_ret.strip() if raw_ret else None,
             line_start=0,
         )

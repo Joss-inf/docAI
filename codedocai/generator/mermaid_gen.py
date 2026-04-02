@@ -41,6 +41,33 @@ def generate_module_diagram(file_ir_list) -> str:
     return "\n".join(lines)
 
 
+def generate_call_graph_diagram(call_graph) -> str:
+    """Render the function call execution graph as a Mermaid flowchart (Max 30 top edges)."""
+    lines = ["```mermaid", "graph TD"]
+
+    # Filter out external nodes and limit size for rendering
+    # We display nodes that have connections or the highest fan-out
+    if not call_graph.edges:
+        return "*(Call graph is empty)*"
+
+    visible_edges = sorted(call_graph.edges, key=lambda e: e.caller_id + e.callee_id)[:50]
+    visible_nodes = set()
+    for e in visible_edges:
+        visible_nodes.add(e.caller_id)
+        visible_nodes.add(e.callee_id)
+
+    for node_id in sorted(visible_nodes):
+        node = call_graph.nodes.get(node_id)
+        label = node.func_name if node else node_id.split("::")[-1]
+        lines.append(f'    {_sanitize(node_id)}["{label}"]')
+
+    for edge in visible_edges:
+        lines.append(f"    {_sanitize(edge.caller_id)} --> {_sanitize(edge.callee_id)}")
+
+    lines.append("```")
+    return "\n".join(lines)
+
+
 def _sanitize(name: str) -> str:
     """Convert a file path to a valid Mermaid node ID."""
     return name.replace("/", "_").replace("\\", "_").replace(".", "_").replace("-", "_")

@@ -56,6 +56,10 @@ def discover_files(
 
         relative = file_path.relative_to(project_root).as_posix()
 
+        # Hard-ignore boilerplate indexers
+        if file_path.name in {"__init__.py", "index.js", "index.ts", "mod.rs"}:
+            continue
+
         # Respect .gitignore
         if gitignore_spec and gitignore_spec.match_file(relative):
             continue

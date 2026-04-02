@@ -45,11 +45,27 @@ from codedocai.orchestrator import run_pipeline
     help="Override the provider base URL.",
 )
 @click.option(
+    "--concurrency", "-c",
+    type=int,
+    default=4,
+    help="Number of parallel LLM requests (default: 4).",
+)
+@click.option(
     "--verbose", "-v",
     is_flag=True,
     help="Enable verbose logging.",
 )
-def main(path, provider, model, output, api_key, base_url, verbose):
+@click.option(
+    "--live",
+    is_flag=True,
+    help="Auto-inject missing docstrings into source files using LLM.",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Report missing docstrings without modifying source files.",
+)
+def main(path, provider, model, output, api_key, base_url, verbose, live, dry_run, concurrency):
     """CodeDocAI — Generate documentation from source code using AI."""
     log_level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(level=log_level, format="%(levelname)s %(name)s: %(message)s")
@@ -58,6 +74,9 @@ def main(path, provider, model, output, api_key, base_url, verbose):
         project_path=Path(path),
         output_dir=output,
         provider=LLMProvider(provider),
+        live=live,
+        dry_run=dry_run,
+        concurrency=concurrency,
     )
 
     if model:

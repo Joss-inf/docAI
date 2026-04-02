@@ -48,3 +48,6 @@ class AppConfig(BaseModel):
     )
     cache_enabled: bool = True
     log_level: str = "INFO"
+    live: bool = False
+    dry_run: bool = False
+    concurrency: int = 4  # Number of parallel LLM requests
