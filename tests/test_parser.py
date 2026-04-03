@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from codedocai.parser.base_parser import get_parser
-from codedocai.semantic.ir_schema import Language
+from src.parser.base_parser import get_parser
+from src.semantic.ir_schema import Language
 
 
 def test_python_parser(tmp_path: Path):

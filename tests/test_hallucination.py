@@ -1,7 +1,7 @@
 """Tests for the hallucination shield."""
 
-from codedocai.semantic.hallucination_check import check_summary
-from codedocai.semantic.ir_schema import (
+from src.semantic.hallucination_check import check_summary
+from src.semantic.ir_schema import (
     ClassIR,
     FileIR,
     FunctionIR,

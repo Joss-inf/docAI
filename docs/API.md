@@ -1,791 +1,590 @@
 # API Reference — doc
 
-## Table of Contents
-- [Config](#config)
-  - [codedocai/config.py](#config)
-- [Controller](#controller)
-  - [codedocai/generator/api_gen.py](#api-gen)
-- [Generic](#generic)
-  - [codedocai/cli.py](#cli)
-  - [codedocai/generator/architecture_gen.py](#architecture-gen)
-  - [codedocai/generator/mermaid_gen.py](#mermaid-gen)
-  - [codedocai/generator/readme_gen.py](#readme-gen)
-  - [codedocai/graph/builder.py](#builder)
-  - [codedocai/graph/exporters.py](#exporters)
-  - [codedocai/llm/base_provider.py](#base-provider)
-  - [codedocai/llm/docstring_builder.py](#docstring-builder)
-  - [codedocai/llm/fallback.py](#fallback)
-  - [codedocai/llm/ollama_provider.py](#ollama-provider)
-  - [codedocai/llm/openai_provider.py](#openai-provider)
-  - [codedocai/llm/prompt_builder.py](#prompt-builder)
-  - [codedocai/mutator/source_writer.py](#source-writer)
-  - [codedocai/orchestrator.py](#orchestrator)
-  - [codedocai/parser/base_parser.py](#base-parser)
-  - [codedocai/parser/js_parser.py](#js-parser)
-  - [codedocai/parser/python_parser.py](#python-parser)
-  - [codedocai/parser/rust_parser.py](#rust-parser)
-  - [codedocai/scanner/language_detect.py](#language-detect)
-  - [codedocai/semantic/enricher.py](#enricher)
-  - [codedocai/semantic/ir_export.py](#ir-export)
-  - [pycacheCleaner.py](#pycachecleaner)
-- [Model](#model)
-  - [codedocai/graph/call_graph.py](#call-graph)
-  - [codedocai/graph/metrics.py](#metrics)
-  - [codedocai/scanner/file_discovery.py](#file-discovery)
-  - [codedocai/semantic/entry_points.py](#entry-points)
-  - [codedocai/semantic/ir_schema.py](#ir-schema)
-  - [codedocai/semantic/validator.py](#validator)
-  - [tests/test_ir_schema.py](#test-ir-schema)
-- [Repository](#repository)
-  - [codedocai/graph/cycles.py](#cycles)
-  - [codedocai/semantic/hallucination_check.py](#hallucination-check)
-- [Test](#test)
-  - [tests/test_call_graph.py](#test-call-graph)
-  - [tests/test_data_flow.py](#test-data-flow)
-  - [tests/test_entry_points.py](#test-entry-points)
-  - [tests/test_graph.py](#test-graph)
-  - [tests/test_hallucination.py](#test-hallucination)
-  - [tests/test_parser.py](#test-parser)
-  - [tests/test_scanner.py](#test-scanner)
-- [Utility](#utility)
-  - [codedocai/generator/utils.py](#utils)
+## `cleaner.py`
+**Role**: generic
 
-## Role: Config
-> Configuration and settings
+### `clean_python_cache(`root_dir: str`)` → `None`
+> Supprime tous les dossiers __pycache__ et fichiers .pyc dans le projet.
+**Calls**: `os.walk, print, os.path.join, shutil.rmtree, dirnames.remove, f.endswith, os.path.join, os.remove`
 
-### codedocai/config.py
-**Language**: python
+---
 
-#### Class LLMProvider (str, Enum)
+## `pycacheCleaner.py`
+**Role**: generic
+
+### `clean_python_cache(`root_dir: str`)` → `None`
+> Supprime tous les dossiers __pycache__ et fichiers .pyc dans le projet.
+**Calls**: `os.walk, print, os.path.join, shutil.rmtree, dirnames.remove, f.endswith, os.path.join, os.remove`
+
+---
+
+## `src/cli.py`
+**Role**: generic
+
+### `main(`path`, `provider`, `model`, `output`, `api_key`, `base_url`, `concurrency`, `verbose`, `live`, `dry_run`)`
+> CodeDocAI — Generate documentation from source code using AI.
+**Calls**: `click.command, click.option, click.option, click.option, click.option, click.option, click.option, click.option, click.option, click.option`
+
+---
+
+## `src/config.py`
+**Role**: config
+
+### Class `LLMProvider`
 > Supported LLM providers.
 
-#### Class OllamaConfig (BaseModel)
+### Class `OllamaConfig`
 > Settings for local Ollama instance.
 
-#### Class OpenAIConfig (BaseModel)
+### Class `OpenAIConfig`
 > Settings for OpenAI-compatible API.
 
-#### Class AppConfig (BaseModel)
+### Class `AppConfig`
 > Top-level application configuration.
 
 ---
 
-## Role: Controller
-> Main orchestration logic
+## `src/generator/api_gen.py`
+**Role**: controller
 
-### codedocai/generator/api_gen.py
-**Language**: python
+### `generate_api_doc(`project: ProjectIR`, `call_graph: CallGraph`)` → `str`
+> Generate a full API reference from IR signatures.
+**Calls**: `sorted, '\n'.join, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append`
 
-#### generate_api_doc(project: ProjectIR, call_graph: CallGraph, include_private: bool, noise_calls: set[str] | None, max_flow_calls: int) → str
-> Generate a full API.md from the project IR,
-grouped by module role and enriched with execution insights.
-
-**Calls:**
-- `Path`
-- `defaultdict`
-- `sorted`
+### `_render_function(`func`, `indent: str`)` → `str`
+**Calls**: `', '.join, parts.append, '\n'.join, parts.append, parts.append, ', '.join`
 
 ---
 
-## Role: Generic
-> Utility and helper modules
+## `src/generator/architecture_gen.py`
+**Role**: generic
 
-### codedocai/cli.py
-**Language**: python
+### `generate_architecture_doc(`project: ProjectIR`, `graph: nx.DiGraph`, `file_summaries: dict[str, str]`, `entry_points: list[EntryPoint]`)` → `str`
+> Generate ARCHITECTURE.md with dependency diagrams and project topology.
+**Calls**: `sorted, '\n'.join, generate_dependency_diagram, file_summaries.get, _role_icon, lines.append, lines.extend, lines.append, len`
 
-#### main(path, provider, model, output, api_key, base_url, verbose, live, dry_run, concurrency)
-> CodeDocAI — Generate documentation from source code using AI.
-
-**Calls:**
-- `AppConfig`
-- `LLMProvider`
-- `Path`
-- `run_pipeline`
+### `_role_icon(`role: str`)` → `str`
+**Calls**: `icons.get`
 
 ---
 
-### codedocai/generator/architecture_gen.py
-**Language**: python
+## `src/generator/mermaid_gen.py`
+**Role**: generic
 
-#### generate_architecture_doc(project: ProjectIR, graph: nx.DiGraph, file_summaries: dict[str, str], entry_points: list[EntryPoint]) → str
-> Generate ARCHITECTURE.md with dependency diagrams, execution flow, and project structure.
-
-**Calls:**
-- `generate_dependency_diagram`
-- `role_icon`
-- `sanitize_summary`
-- `sorted`
+### `generate_dependency_diagram(`graph: nx.DiGraph`)` → `str`
+> Render a Mermaid flowchart from the dependency graph.
+**Calls**: `lines.append, '\n'.join, node.replace('/', '_').replace, lines.append, u.replace('/', '_').replace, v.replace('/', '_').replace, lines.append, node.replace, u.replace, v.replace`
 
 ---
 
-### codedocai/generator/mermaid_gen.py
-**Language**: python
+## `src/generator/readme_gen.py`
+**Role**: generic
 
-#### generate_dependency_diagram(graph: nx.DiGraph) → str
-> Render the project dependency graph as a Mermaid flowchart.
-
-**Calls:**
-- `sorted`
-
-#### generate_module_diagram(file_ir_list) → str
-> Render a class/function overview diagram for a set of files.
-
-#### generate_call_graph_diagram(call_graph) → str
-> Render the function call execution graph as a Mermaid flowchart (Max 30 top edges).
-
-**Calls:**
-- `sorted`
+### `generate_readme(`project: ProjectIR`)` → `str`
+> Generate a pure USER-CENTRIC README.md.
+**Calls**: `'\n'.join`
 
 ---
 
-### codedocai/generator/readme_gen.py
-**Language**: python
+## `src/generator/utils.py`
+**Role**: utility
 
-#### generate_readme(project: ProjectIR) → str
-> Generate a pure user-centric README.md (Tutorial/Overview).
-
-**Calls:**
-- `sanitize_summary`
+### `sanitize_summary(`text: str`)` → `str`
+> Clean LLM output from markdown blocks and preambles.
+**Calls**: `re.sub, re.sub, re.sub, text.strip`
 
 ---
 
-### codedocai/graph/builder.py
-**Language**: python
+## `src/graph/builder.py`
+**Role**: generic
 
-#### build_dependency_graph(project: ProjectIR) → nx.DiGraph
+### `build_dependency_graph(`project: ProjectIR`)` → `nx.DiGraph`
 > Create a directed graph where edges represent import relationships.
 
 Nodes are file paths (relative).  An edge A → B means "A imports B".
+**Calls**: `nx.DiGraph, _build_file_lookup, graph.add_node, _resolve_import, graph.add_edge, logger.debug, logger.debug, imp.module.startswith`
 
-**Calls:**
-- `graph.add_edge`
-- `graph.add_node`
-- `nx.DiGraph`
+### `_build_file_lookup(`project: ProjectIR`)` → `dict[str, str]`
+> Map possible module names to their file paths.
+**Calls**: `PurePosixPath, str(path.with_suffix('')).replace, str, path.with_suffix`
 
----
-
-### codedocai/graph/exporters.py
-**Language**: python
-
-#### export_call_graph_json(call_graph: CallGraph, output_dir: Path) → None
-> Export the Call Graph to a JSON file.
-
-**Calls:**
-- `out_path.write_text`
-
-#### export_ir_csv(project: ProjectIR, output_dir: Path) → None
-> Export the flattened IR metrics to a CSV file for analytical ingestion.
-
-**Calls:**
-- `csv.writer`
-- `writer.writerow`
+### `_resolve_import(`module: str`, `source_file: str`, `lookup: dict[str, str]`)` → `str | None`
+> Try to resolve an import string to a known project file.
+**Calls**: `lookup.items, key.endswith`
 
 ---
 
-### codedocai/llm/base_provider.py
-**Language**: python
+## `src/graph/call_graph.py`
+**Role**: generic
 
-#### Class BaseLLMProvider (ABC)
+### `build_call_graph(`project: ProjectIR`)` → `CallGraph`
+> Build a global call graph across all project modules.
+**Calls**: `CallGraph, cg.nx_graph.add_node, FunctionNode, cg.nx_graph.add_node, FunctionNode, potential_id.endswith, cg.nx_graph.add_edge, cg.edges.append, cg.edges.append, cg.nx_graph.add_edge`
+
+### Class `FunctionNode`
+
+### Class `CallEdge`
+
+### Class `CallGraph`
+> Project-wide call graph.
+
+#### `__init__()`
+**Calls**: `nx.DiGraph`
+
+#### `compute_metrics()` → `dict`
+**Calls**: `nx.betweenness_centrality, len, self.nx_graph.in_degree, self.nx_graph.out_degree, betweenness.get`
+
+---
+
+## `src/graph/cycles.py`
+**Role**: repository
+
+### `detect_cycles(`graph: nx.DiGraph`, `call_graph: CallGraph`)` → `CycleReport`
+> Detect circular dependencies using NetworkX.
+**Calls**: `list, CycleReport, nx.simple_cycles, SingleCycle, CycleReport, len`
+
+### Class `SingleCycle`
+
+### Class `CycleReport`
+
+---
+
+## `src/graph/exporters.py`
+**Role**: generic
+
+### `export_call_graph_json(`call_graph: CallGraph`, `output_dir: Path`)` → `None`
+> Export the call graph as a D3-compatible JSON structure.
+**Calls**: `(output_dir / 'call_graph.json').write_text, json.dumps`
+
+### `export_ir_csv(`project: ProjectIR`, `output_dir: Path`)` → `None`
+> Export flattened IR metrics for easy CSV analysis.
+**Calls**: `open, csv.writer, writer.writerow, writer.writerow, len, len, len`
+
+---
+
+## `src/graph/metrics.py`
+**Role**: generic
+
+### `compute_metrics(`graph: nx.DiGraph`, `call_graph: CallGraph`, `project: ProjectIR`)` → `list[NodeMetrics]`
+> Compute V2 Criticality by blending structural file deps with functional execution bounds.
+**Calls**: `sorted, graph.in_degree, graph.out_degree, metrics.append, NodeMetrics`
+
+### `topological_order(`graph: nx.DiGraph`)` → `list[str]`
+**Calls**: `list, nx.topological_sort, sorted, list`
+
+### Class `NodeMetrics`
+
+---
+
+## `src/llm/base_provider.py`
+**Role**: generic
+
+### Class `BaseLLMProvider`
 > All LLM providers (local and external) implement this contract.
 
-##### summarize(prompt: str) → str
+#### `summarize(`prompt: str`)` → `str`
 > Send a prompt and return the LLM's text response.
 
-##### is_available() → bool
+#### `is_available()` → `bool`
 > Check whether the provider is reachable.
 
 ---
 
-### codedocai/llm/docstring_builder.py
-**Language**: python
+## `src/llm/docstring_builder.py`
+**Role**: generic
 
-#### build_docstring_prompt(func: FunctionIR, source_code: str, role: ModuleRole) → str
-> Construct a strict prompt instructing the LLM to generate a raw docstring.
+### `build_docstring_prompt(`func: FunctionIR`, `source_code: str`, `role: ModuleRole`)` → `str`
+> Construct a prompt for generating a Python/JS/Rust docstring.
 
 ---
 
-### codedocai/llm/fallback.py
-**Language**: python
+## `src/llm/fallback.py`
+**Role**: generic
 
-#### generate_fallback_summary(file_ir: FileIR) → str
+### `generate_fallback_summary(`file_ir: FileIR`)` → `str`
 > Produce a template-based summary from IR when LLM fails.
+**Calls**: `len, len, ' '.join, ', '.join, parts.append, ', '.join, parts.append, ', '.join, parts.append, parts.append`
 
-**Calls:**
-- `sorted`
-
-#### generate_fallback_project_summary(file_summaries: dict[str, str]) → str
+### `generate_fallback_project_summary(`file_summaries: dict[str, str]`)` → `str`
 > Produce a template-based project summary when LLM fails.
+**Calls**: `len`
 
 ---
 
-### codedocai/llm/ollama_provider.py
-**Language**: python
+## `src/llm/ollama_provider.py`
+**Role**: generic
 
-#### Class OllamaProvider (BaseLLMProvider)
+### Class `OllamaProvider`
 > Local LLM via Ollama HTTP API.
 
-##### __init__(config: OllamaConfig) → None
+#### `__init__(`config: OllamaConfig`)` → `None`
+**Calls**: `httpx.Client`
 
-**Calls:**
-- `httpx.Client`
+#### `summarize(`prompt: str`)` → `str`
+**Calls**: `range, logger.error, self._client.post, resp.raise_for_status, resp.json().get, logger.error, logger.warning, time.sleep, logger.warning, time.sleep`
 
-##### summarize(prompt: str) → str
-
-**Calls:**
-- `resp.json`
-- `resp.raise_for_status`
-- `time.sleep`
-
-##### is_available() → bool
+#### `is_available()` → `bool`
 > Check if Ollama is running AND the configured model is present.
-
-**Calls:**
-- `resp.json`
+**Calls**: `self._client.get, resp.json().get, any, logger.info, resp.json, m.get('name', '').startswith, m.get`
 
 ---
 
-### codedocai/llm/openai_provider.py
-**Language**: python
+## `src/llm/openai_provider.py`
+**Role**: generic
 
-#### Class OpenAIProvider (BaseLLMProvider)
+### Class `OpenAIProvider`
 > External LLM via OpenAI-compatible chat completions API.
 
-##### __init__(config: OpenAIConfig) → None
+#### `__init__(`config: OpenAIConfig`)` → `None`
+**Calls**: `httpx.Client`
 
-**Calls:**
-- `httpx.Client`
+#### `summarize(`prompt: str`)` → `str`
+**Calls**: `range, logger.error, self._client.post, resp.raise_for_status, resp.json, logger.warning, time.sleep`
 
-##### summarize(prompt: str) → str
-
-**Calls:**
-- `resp.json`
-- `resp.raise_for_status`
-- `time.sleep`
-
-##### is_available() → bool
+#### `is_available()` → `bool`
+**Calls**: `self._client.get`
 
 ---
 
-### codedocai/llm/prompt_builder.py
-**Language**: python
+## `src/llm/prompt_builder.py`
+**Role**: generic
 
-#### build_file_summary_prompt(file_ir: FileIR, source_code: str, whitelist: set[str], incoming_calls: list[str] | None, imported_by: list[str] | None, imports_from: list[str] | None) → str
-> Build a prompt for summarizing a single file from its IR.
+### `build_file_summary_prompt(`file_ir: FileIR`, `source_code: str`, `whitelist: set[str]`, `incoming_calls: list[str]`, `imported_by: list[str]`, `imports_from: list[str]`)` → `str`
+> Build a rich grounded prompt for high-fidelity summary.
+**Calls**: `lines.extend, '\n'.join, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append`
 
-Includes cross-file dependency context when available.
+### `build_batch_summary_prompt(`batch_data: list[tuple[FileIR, set[str]]]`)` → `str`
+> Analyze multiple utility files and return a JSON mapping [path -> summary].
+**Calls**: `files_info.append, len, json.dumps, list`
 
-**Calls:**
-- `sorted`
-
-#### build_project_summary_prompt(project: ProjectIR, file_summaries: dict[str, str], entry_points: list[EntryPoint] | None, metrics: list[NodeMetrics] | None) → str
-> Build a prompt for the project-level summary using file summaries.
-
-#### build_batch_summary_prompt(batch: list[tuple[FileIR, set[str]]]) → str
-> Build a prompt for summarizing multiple files at once.
-
-**Calls:**
-- `sorted`
+### `build_project_summary_prompt(`project: ProjectIR`, `file_summaries: dict[str, str]`, `entry_points: list[EntryPoint]`, `metrics: list[NodeMetrics]`)` → `str`
+> Build a high-level architectural overview prompt.
+**Calls**: `lines.append, lines.extend, '\n'.join, lines.append, sorted, lines.append, len, file_summaries.get`
 
 ---
 
-### codedocai/mutator/source_writer.py
-**Language**: python
+## `src/mutator/source_writer.py`
+**Role**: generic
 
-#### inject_docstring(file_path: Path, func: FunctionIR, new_docstring: str, language: Language) → bool
-> Inject or replace a docstring into the source file text safely.
-
-Returns True if the file was modified, False otherwise.
-
-**Calls:**
-- `file_path.read_text`
-- `file_path.write_text`
+### `inject_docstring(`file_path: Path`, `function_name: str`, `docstring: str`)` → `bool`
+> Inject a docstring into a Python function (stub for now).
+**Calls**: `logger.info`
 
 ---
 
-### codedocai/orchestrator.py
-**Language**: python
+## `src/orchestrator.py`
+**Role**: generic
 
-#### run_pipeline(config: AppConfig) → None
+### `run_pipeline(`config: AppConfig`)` → `None`
 > Execute the full documentation generation pipeline.
+**Calls**: `time.time, config.project_path.resolve, output_dir.mkdir, console.print, load_ir, time.time, list, time.time, ProjectIR, time.time`
 
-**Calls:**
-- `(config.project_path / file_ir.file_path).read_text`
-- `(output_dir / 'API.md').write_text`
-- `(output_dir / 'ARCHITECTURE.md').write_text`
-- `(output_dir / 'README.md').write_text`
-- `(output_dir / 'metrics.json').write_text`
-- _Other internal calls hidden_
+### `_get_provider(`config: AppConfig`)`
+**Calls**: `OpenAIProvider, OllamaProvider`
 
 ---
 
-### codedocai/parser/base_parser.py
-**Language**: python
+## `src/parser/base_parser.py`
+**Role**: generic
 
-#### get_parser(language: str) → AbstractParser
+### `get_parser(`language: str`)` → `AbstractParser`
 > Factory: return the right parser for a language string.
+**Calls**: `_registry.get, PythonParser, JSParser, JSParser, RustParser, ValueError`
 
-**Calls:**
-- `JSParser`
-- `PythonParser`
-- `RustParser`
+### Class `AbstractParser`
 
-#### Class AbstractParser (ABC)
-> Base class for language-specific AST parsers.
-
-Every parser reads a source file and returns a standardised FileIR.
-
-##### parse(file_path: Path, relative_path: str) → FileIR
-> Parse a single source file and return its IR.
+#### `parse(`path: Path`, `relative_path: str`)` → `FileIR`
+> Parse a source file and return its IR.
 
 ---
 
-### codedocai/parser/js_parser.py
-**Language**: python
+## `src/parser/js_parser.py`
+**Role**: generic
 
-#### Class JSParser (AbstractParser)
+### Class `JSParser`
 > Lightweight JS/TS parser using regex patterns.
 
-##### parse(file_path: Path, relative_path: str) → FileIR
+#### `parse(`file_path: Path`, `relative_path: str`)` → `FileIR`
+**Calls**: `file_path.read_text, FileIR, self._extract_imports, self._extract_functions, self._extract_classes`
 
-**Calls:**
-- `FileIR`
-- `file_path.read_text`
+#### `_extract_imports(`source: str`)` → `list[ImportIR]`
+**Calls**: `_IMPORT_RE.finditer, m.group, imports.append, m.group, m.group, m.group, m.group, n.strip, names.insert, ImportIR`
+
+#### `_extract_functions(`source: str`)` → `list[FunctionIR]`
+**Calls**: `_FUNCTION_RE.finditer, _ARROW_RE.finditer, funcs.append, funcs.append, self._match_to_func, self._match_to_func`
+
+#### `_extract_classes(`source: str`)` → `list[ClassIR]`
+**Calls**: `_CLASS_RE.finditer, m.group, m.group, classes.append, ClassIR, source[:m.start()].count, m.start`
+
+#### `_match_to_func(`m: re.Match`)` → `FunctionIR`
+**Calls**: `FunctionIR, m.group, ParameterIR, raw_params.split, p.strip, m.group, bool, p.split(':')[0].strip, m.group, (m.groupdict().get('ret') or '').strip`
 
 ---
 
-### codedocai/parser/python_parser.py
-**Language**: python
+## `src/parser/python_parser.py`
+**Role**: generic
 
-#### Class PythonParser (AbstractParser)
+### Class `PythonParser`
 > Extracts IR from Python source files using the stdlib `ast` module.
 
-##### parse(file_path: Path, relative_path: str) → FileIR
+#### `parse(`file_path: Path`, `relative_path: str`)` → `FileIR`
+**Calls**: `file_path.read_text, FileIR, ast.parse, logger.warning, FileIR, ast.get_docstring, self._extract_imports, self._extract_functions, self._extract_classes, str`
 
-**Calls:**
-- `FileIR`
-- `file_path.read_text`
+#### `_extract_imports(`tree: ast.Module`)` → `list[ImportIR]`
+**Calls**: `ast.walk, isinstance, isinstance, imports.append, imports.append, ImportIR, ImportIR`
 
----
+#### `_extract_functions(`tree: ast.Module`)` → `list[FunctionIR]`
+> Extract top-level functions (not methods inside classes).
+**Calls**: `self._build_function_ir, ast.iter_child_nodes, isinstance`
 
-### codedocai/parser/rust_parser.py
-**Language**: python
+#### `_extract_classes(`tree: ast.Module`)` → `list[ClassIR]`
+**Calls**: `ast.iter_child_nodes, isinstance, classes.append, self._build_function_ir, ClassIR, isinstance, ast.get_docstring, self._unparse_node, self._unparse_node`
 
-#### Class RustParser (AbstractParser)
-> Lightweight Rust parser using regex patterns.
+#### `_build_function_ir(`node: ast.FunctionDef | ast.AsyncFunctionDef`)` → `FunctionIR`
+**Calls**: `self._extract_params, self._extract_calls, FunctionIR, self._unparse_node, ast.get_docstring, isinstance, self._unparse_node`
 
-##### parse(file_path: Path, relative_path: str) → FileIR
+#### `_extract_params(`args: ast.arguments`)` → `list[ParameterIR]`
+**Calls**: `params.append, ParameterIR, self._unparse_node`
 
-**Calls:**
-- `FileIR`
-- `file_path.read_text`
+#### `_extract_calls(`node: ast.AST`)` → `list[str]`
+> Collect names of all function/method calls inside a node.
+**Calls**: `ast.walk, isinstance, calls.append, self._unparse_node`
 
----
-
-### codedocai/scanner/language_detect.py
-**Language**: python
-
-#### detect_language(file_path: Path) → Language
-> Return the language for a given file path based on its extension.
-
-#### Class Language (str, Enum)
-> Supported programming languages.
+#### `_unparse_node(`node: ast.AST | None`)` → `str`
+> Safely convert an AST node back to its source string.
+**Calls**: `ast.unparse`
 
 ---
 
-### codedocai/semantic/enricher.py
-**Language**: python
+## `src/parser/rust_parser.py`
+**Role**: generic
 
-#### enrich_file_ir(file_ir: FileIR) → FileIR
-> Enrich a FileIR with roles, side-effects, criticality, and data flow.
+### Class `RustParser`
 
-**Calls:**
+#### `parse(`path: Path`, `relative_path: str`)` → `FileIR`
+**Calls**: `path.read_text, FileIR, re.finditer, re.finditer, re.finditer, re.finditer, re.finditer, file_ir.imports.append, file_ir.imports.append, match.group`
 
----
-
-### codedocai/semantic/ir_export.py
-**Language**: python
-
-#### export_ir(project: ProjectIR, output_dir: Path) → Path
-> Write the full ProjectIR to a JSON file for debugging / RAG use.
-
-**Calls:**
-- `output_path.write_text`
-- `project.model_dump`
-
-#### load_ir(output_dir: Path) → ProjectIR | None
-> Load a previously exported ProjectIR, if available.
-
-**Calls:**
-- `ProjectIR.model_validate`
-- `ir_path.exists`
-- `ir_path.read_text`
-
-#### file_hash(file_path: Path) → str
-> Compute a SHA-256 hash for a file's contents.
-
-**Calls:**
-- `file_path.read_bytes`
-- `hashlib.sha256`
-- `hashlib.sha256(content).hexdigest`
+#### `_parse_func_match(`match: re.Match`)` → `FunctionIR`
+**Calls**: `match.group, match.group, params_raw.split, FunctionIR, match.group, match.group(5).strip, match.group, p.split, params.append, match.group`
 
 ---
 
-### pycacheCleaner.py
-**Language**: python
+## `src/scanner/file_discovery.py`
+**Role**: generic
 
-#### clean_python_cache(root_dir: str) → None
-> Supprime tous les dossiers __pycache__ et fichiers .pyc dans le projet.
+### `_load_gitignore(`project_root: Path`)` → `pathspec.PathSpec | None`
+> Load .gitignore patterns from the project root.
+**Calls**: `gitignore.exists, open, pathspec.PathSpec.from_lines`
 
-**Calls:**
-- `os.walk`
-
----
-
-## Role: Model
-
-### codedocai/graph/call_graph.py
-**Language**: python
-
-#### build_call_graph(project: ProjectIR) → CallGraph
-> Build a global function-level call graph across the project.
-
-**Calls:**
-- `CallEdge`
-- `CallGraph`
-- `FunctionNode`
-- `cg.add_edge`
-- `cg.add_node`
-
-#### Class FunctionNode
-> A node representing a function or method in the call graph.
-
-#### Class CallEdge
-> A directed edge representing a function call.
-
-#### Class CallGraph
-> Function-level execution graph.
-
-##### __init__()
-
-**Calls:**
-- `nx.DiGraph`
-
-##### add_node(node: FunctionNode)
-
-##### add_edge(edge: CallEdge)
-
-##### compute_metrics() → dict[str, dict]
-> Compute structural metrics for all function nodes.
-
-**Calls:**
-- `nx.simple_cycles`
-- `nx.single_source_shortest_path_length`
-
----
-
-### codedocai/graph/metrics.py
-**Language**: python
-
-#### compute_metrics(graph: nx.DiGraph, call_graph: CallGraph, project: ProjectIR) → list[NodeMetrics]
-> Compute V2 Criticality by blending structural file deps with functional execution bounds.
-
-**Calls:**
-- `NodeMetrics`
-- `call_graph.compute_metrics`
-- `graph.in_degree`
-- `graph.out_degree`
-
-#### topological_order(graph: nx.DiGraph) → list[str]
-> Return a deterministic topological ordering of nodes.
-
-If the graph has cycles, returns best-effort ordering by
-removing back-edges.
-
-**Calls:**
-- `nx.topological_sort`
-- `sorted`
-
-#### Class NodeMetrics
-> Metrics for a single file module in the dependency graph.
-
----
-
-### codedocai/scanner/file_discovery.py
-**Language**: python
-
-#### discover_files(project_root: Path, supported_extensions: list[str], exclude_dirs: list[str]) → Iterator[DiscoveredFile]
+### `discover_files(`project_root: Path`, `supported_extensions: list[str]`, `exclude_dirs: list[str]`)` → `Iterator[DiscoveredFile]`
 > Walk the project tree and yield source files, respecting .gitignore.
+**Calls**: `project_root.resolve, _load_gitignore, project_root.rglob, d.lower, any, file_path.relative_to(project_root).as_posix, detect_language, logger.debug, file_path.is_file, file_path.suffix.lower`
 
-**Calls:**
-- `DiscoveredFile`
-- `detect_language`
-- `file_path.is_file`
-- `file_path.relative_to`
-- `file_path.relative_to(project_root).as_posix`
-- _Other internal calls hidden_
-
-#### Class DiscoveredFile
+### Class `DiscoveredFile`
 > A source file discovered during scanning.
 
 ---
 
-### codedocai/semantic/entry_points.py
-**Language**: python
+## `src/scanner/language_detect.py`
+**Role**: generic
 
-#### detect_entry_points(project: ProjectIR, call_graph: CallGraph) → list[EntryPoint]
+### `detect_language(`file_path: Path`)` → `Language`
+> Return the language for a given file path based on its extension.
+**Calls**: `_EXT_MAP.get, file_path.suffix.lower`
+
+### Class `Language`
+> Supported programming languages.
+
+---
+
+## `src/semantic/enricher.py`
+**Role**: generic
+
+### `enrich_file_ir(`file_ir: FileIR`)` → `FileIR`
+**Calls**: `_detect_role, _enrich_function, _enrich_function`
+
+### `_enrich_function(`func: FunctionIR`)`
+**Calls**: `_enrich_data_flow, _assign_criticality`
+
+### `_detect_role(`file_ir: FileIR`)` → `ModuleRole`
+**Calls**: `file_ir.file_path.lower, _ROLE_PATTERNS.items, pattern.search, cls.name.lower`
+
+### `_detect_side_effects(`func: FunctionIR`)` → `list[SideEffect]`
+**Calls**: `' '.join(func.calls).lower, _SIDE_EFFECT_PATTERNS.items, any, ' '.join, effects.append, kw.lower`
+
+### `_enrich_data_flow(`func: FunctionIR`)`
+> Identify data flow properties like reads, writes, and purity.
+**Calls**: `_detect_side_effects, any, call.lower, any, any, func.io_operations.append, func.reads.append, func.writes.append, call.split, call.split`
+
+### `_assign_criticality(`func: FunctionIR`)`
+**Calls**: `len`
+
+---
+
+## `src/semantic/entry_points.py`
+**Role**: generic
+
+### `detect_entry_points(`project: ProjectIR`, `call_graph: CallGraph`)` → `list[EntryPoint]`
 > Scan the project for executable roots and trace their execution trees.
+**Calls**: `nx.descendants, list, EntryPoint, entry_points.append, nx.single_source_shortest_path_length, max, paths.values`
 
-**Calls:**
-- `EntryPoint`
-- `nx.descendants`
-- `nx.single_source_shortest_path_length`
-
-#### Class EntryPoint
+### Class `EntryPoint`
 > An execution root node inside the application.
 
 ---
 
-### codedocai/semantic/ir_schema.py
-**Language**: python
+## `src/semantic/hallucination_check.py`
+**Role**: repository
 
-#### Class Language (str, Enum)
+### `build_symbol_whitelist(`file_ir: FileIR`)` → `set[str]`
+**Calls**: `terms.add, terms.update, terms.add, terms.update, terms.add, terms.add, terms.add, terms.update, terms.add, len`
 
-#### Class SideEffect (str, Enum)
-> Known side-effect categories.
+### `check_summary(`file_ir: FileIR`, `summary: str`)` → `HallucinationReport`
+**Calls**: `HallucinationReport, build_symbol_whitelist, re.findall, len, _check_missing_critical_components, any, len, max, t.lower, report.flagged_terms.append`
 
-#### Class ModuleRole (str, Enum)
-> Heuristic role assigned during semantic enrichment.
+### `_check_missing_critical_components(`file_ir`, `summary`, `report`, `config`)`
+**Calls**: `summary.lower, report.missing_critical.append, f.name.lower`
 
-#### Class ParameterIR (BaseModel)
-> A single function/method parameter.
+### Class `HallucinationSeverity`
 
-#### Class FunctionIR (BaseModel)
-> Intermediate representation of a function or method.
-
-#### Class ClassIR (BaseModel)
-> Intermediate representation of a class.
-
-#### Class ImportIR (BaseModel)
-> A single import statement.
-
-#### Class FileIR (BaseModel)
-> IR for an entire source file.
-
-#### Class ProjectIR (BaseModel)
-> IR for the entire project.
+### Class `HallucinationReport`
 
 ---
 
-### codedocai/semantic/validator.py
-**Language**: python
+## `src/semantic/ir_export.py`
+**Role**: generic
 
-#### validate_project_ir(project: ProjectIR) → ValidationResult
+### `export_ir(`project: ProjectIR`, `output_dir: Path`)` → `None`
+> Save the project IR to a JSON file for caching and analysis.
+**Calls**: `project.model_dump, dump_path.write_text, logger.info, json.dumps`
+
+### `load_ir(`output_dir: Path`)` → `ProjectIR | None`
+> Load a previously exported IR from the documentation folder.
+**Calls**: `dump_path.exists, json.loads, ProjectIR.model_validate, dump_path.read_text, logger.warning`
+
+### `file_hash(`path: Path`)` → `str`
+> Compute a SHA256 hash of a file's content for change detection.
+**Calls**: `hashlib.sha256, hasher.hexdigest, open, f.read, hasher.update`
+
+---
+
+## `src/semantic/ir_schema.py`
+**Role**: model
+
+### Class `Language`
+
+### Class `SideEffect`
+
+### Class `ModuleRole`
+
+### Class `ParameterIR`
+
+### Class `FunctionIR`
+
+### Class `ClassIR`
+
+### Class `ImportIR`
+
+### Class `FileIR`
+
+### Class `ProjectIR`
+
+---
+
+## `src/semantic/validator.py`
+**Role**: generic
+
+### `validate_project_ir(`project: ProjectIR`)` → `ValidationResult`
 > Validate the entire project IR for completeness and consistency.
+**Calls**: `ValidationResult, symbol_counts.items, _validate_file, _count_symbol, _count_symbol, result.ambiguous_symbols.append, result.warnings.append, logger.warning`
 
-**Calls:**
-- `ValidationResult`
+### `_validate_file(`file_ir: FileIR`, `result: ValidationResult`)` → `None`
+> Check a single file IR for issues.
+**Calls**: `result.warnings.append, result.warnings.append`
 
-#### Class ValidationResult
+### `_count_symbol(`counts: dict[str, int]`, `name: str`)` → `None`
+**Calls**: `counts.get`
+
+### Class `ValidationResult`
 > Outcome of validating a ProjectIR.
 
 ---
 
-### tests/test_ir_schema.py
-**Language**: python
+## `tests/test_call_graph.py`
+**Role**: test
 
-#### test_role_detection()
-
-**Calls:**
-- `FileIR`
-- `enrich_file_ir`
-
-#### test_side_effect_detection()
-
-**Calls:**
-- `FileIR`
-- `FunctionIR`
-- `enrich_file_ir`
+### `test_call_graph_resolution()`
+**Calls**: `ProjectIR, FileIR, FileIR, build_call_graph, cg.compute_metrics, len, len, FunctionIR, FunctionIR`
 
 ---
 
-## Role: Repository
+## `tests/test_data_flow.py`
+**Role**: test
 
-### codedocai/graph/cycles.py
-**Language**: python
-
-#### detect_cycles(graph: nx.DiGraph, call_graph: CallGraph) → CycleReport
-> Find all strongly connected components in imports and calls.
-
-**Calls:**
-- `CycleReport`
-- `CycleWarning`
-- `nx.strongly_connected_components`
-- `sorted`
-
-#### Class CycleWarning
-> A detected cycle with analysis of its impact and fixes.
-
-#### Class CycleReport
-> Result of cycle detection in the dependency graph.
+### `test_data_flow_enrichment()`
+**Calls**: `FunctionIR, _enrich_data_flow, FunctionIR, _enrich_data_flow`
 
 ---
 
-### codedocai/semantic/hallucination_check.py
-**Language**: python
+## `tests/test_entry_points.py`
+**Role**: test
 
-#### build_symbol_whitelist(file_ir: FileIR) → set[str]
-> Collect all valid identifiers from the IR for grounding.
-
-**Calls:**
-
-#### check_summary(file_ir: FileIR, summary: str) → HallucinationReport
-> Cross-check an LLM summary against the file's IR.
-
-Extracts technical terms from the summary and verifies each
-one exists somewhere in the IR (function names, class names,
-import modules, param names,
-
-**Calls:**
-- `HallucinationReport`
-
-#### Class HallucinationReport
-> Result of cross-checking a summary against its IR.
+### `test_detect_entry_points()`
+**Calls**: `ProjectIR, FileIR, build_call_graph, detect_entry_points, len, FunctionIR, FunctionIR`
 
 ---
 
-## Role: Test
+## `tests/test_graph.py`
+**Role**: test
 
-### tests/test_call_graph.py
-**Language**: python
+### `test_graph_builder_and_metrics()`
+**Calls**: `ProjectIR, build_dependency_graph, graph.has_edge, graph.has_edge, graph.has_edge, CallGraph, compute_metrics, next, detect_cycles, graph.number_of_nodes`
 
-#### test_call_graph_resolution()
-
-**Calls:**
-- `FileIR`
-- `FunctionIR`
-- `ProjectIR`
-- `build_call_graph`
-- `cg.compute_metrics`
+### `test_cycle_detection()`
+**Calls**: `ProjectIR, build_dependency_graph, CallGraph, detect_cycles, len, FileIR, FileIR, ImportIR, ImportIR`
 
 ---
 
-### tests/test_data_flow.py
-**Language**: python
+## `tests/test_hallucination.py`
+**Role**: test
 
-#### test_data_flow_enrichment()
+### `test_hallucination_check_clean()`
+**Calls**: `FileIR, check_summary, len, ImportIR, FunctionIR, ClassIR, ParameterIR, FunctionIR`
 
-**Calls:**
-- `FunctionIR`
-
----
-
-### tests/test_entry_points.py
-**Language**: python
-
-#### test_detect_entry_points()
-
-**Calls:**
-- `FileIR`
-- `FunctionIR`
-- `ProjectIR`
-- `build_call_graph`
-- `detect_entry_points`
+### `test_hallucination_check_flagged()`
+**Calls**: `FileIR, check_summary, FunctionIR`
 
 ---
 
-### tests/test_graph.py
-**Language**: python
+## `tests/test_ir_schema.py`
+**Role**: model
 
-#### test_graph_builder_and_metrics()
+### `test_role_detection()`
+**Calls**: `FileIR, enrich_file_ir, FileIR, enrich_file_ir, FileIR, enrich_file_ir, FileIR, enrich_file_ir`
 
-**Calls:**
-- `CallGraph`
-- `FileIR`
-- `ImportIR`
-- `ProjectIR`
-- `build_dependency_graph`
-- _Other internal calls hidden_
-
-#### test_cycle_detection()
-
-**Calls:**
-- `CallGraph`
-- `FileIR`
-- `ImportIR`
-- `ProjectIR`
-- `build_dependency_graph`
-- _Other internal calls hidden_
+### `test_side_effect_detection()`
+**Calls**: `FileIR, enrich_file_ir, FunctionIR, FunctionIR, FunctionIR, FunctionIR`
 
 ---
 
-### tests/test_hallucination.py
-**Language**: python
+## `tests/test_parser.py`
+**Role**: test
 
-#### test_hallucination_check_clean()
+### `test_python_parser(`tmp_path: Path`)`
+**Calls**: `file_path.write_text, get_parser, parser.parse, len, len, len, len`
 
-**Calls:**
-- `ClassIR`
-- `FileIR`
-- `FunctionIR`
-- `ImportIR`
-- `ParameterIR`
-- _Other internal calls hidden_
+### `test_javascript_parser(`tmp_path: Path`)`
+**Calls**: `file_path.write_text, get_parser, parser.parse, len, len, len`
 
-#### test_hallucination_check_flagged()
-
-**Calls:**
-- `FileIR`
-- `FunctionIR`
-- `check_summary`
+### `test_rust_parser(`tmp_path: Path`)`
+**Calls**: `file_path.write_text, get_parser, parser.parse, len, len, len, len`
 
 ---
 
-### tests/test_parser.py
-**Language**: python
+## `tests/test_scanner.py`
+**Role**: test
 
-#### test_python_parser(tmp_path: Path)
-
-**Calls:**
-- `file_path.write_text`
-- `get_parser`
-- `parser.parse`
-
-#### test_javascript_parser(tmp_path: Path)
-
-**Calls:**
-- `file_path.write_text`
-- `get_parser`
-- `parser.parse`
-
-#### test_rust_parser(tmp_path: Path)
-
-**Calls:**
-- `file_path.write_text`
-- `get_parser`
-- `parser.parse`
-
----
-
-### tests/test_scanner.py
-**Language**: python
-
-#### test_detect_language()
-
-**Calls:**
-- `Path`
-- `detect_language`
-
----
-
-## Role: Utility
-
-### codedocai/generator/utils.py
-**Language**: python
-
-#### role_icon(role: str) → str
-> Return a simple text marker for a module role.
-
-#### sanitize_summary(text: str) → str
-> Strip LLM preambles, internal tokens, and code blocks.
+### `test_detect_language()`
+**Calls**: `detect_language, detect_language, detect_language, detect_language, detect_language, detect_language, Path, Path, Path, Path`
 
 ---

@@ -1,40 +1,30 @@
-# doc — Documentation Engine
+# doc
 
 ## Overview
-CodeDocAI utilizes the `codedocai` library, which provides a CLI for generating documentation. The `codedocai` library, and its components, form the core of the project. It leverages OpenAI models for document generation and utilizes a configuration system to manage LLM providers and API keys. The `orchestrator` module manages the document generation workflow, and the `mutator` module inserts docstrings into source code. Finally, the `graph` module defines dependency relationships through a graph data structure.
+Here’s a 4-5 sentence architectural overview for the README, focusing on data flow:
 
-## 🚀 Key Features
-- **Precise Code Intelligence**: Uses deterministic AST parsing to map your codebase with zero hallucinations.
-- **Execution-Aware**: Understands real behavior by tracing entry points and call graphs.
-- **Strict Grounding**: Documentation is derived exclusively from real code symbols (IR).
-- **Automated Refinement**: Self-checks summaries to eliminate inaccuracies.
+The project’s data flows primarily from the entry points, which act as initial gateways for various projects. These entry points utilize the `base_parser` to handle diverse languages and subsequently feed data into the core layers. The `call_graph.py` module then builds a complex call graph representing the system’s operations, enabling analysis and performance evaluation.  Finally, the `semantic/ir_schema.py` and `graph/call_graph.py` modules contribute to the data flow by providing schema definitions and graph-based analysis, ensuring data integrity and efficient processing. This structured flow supports robust project automation and discovery.
 
-## 🛠️ Getting Started (Tutorial)
-Follow these steps to generate high-precision documentation for your project.
+## Key Features
+- **Automated Documentation**: Generates API, Architecture, and README files.
+- **AI Grounding**: High-fidelity summaries with IR-based hallucination checks.
+- **Performance**: Parallelized pipeline with batch summarization.
 
-### 1. Installation
-Ensure you have Python 3.10+ and the required dependencies installed:
+## Getting Started
+### Installation
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Prepare your LLM
-By default, CodeDocAI uses **Ollama** for local inference. Ensure it is running:
+### Usage
+Generate documentation for your project:
 ```bash
-ollama run gemma3:1b
+python -m src.cli --path . --model gemma3:1b --concurrency 8
 ```
 
-### 3. Generate Documentation
-Run the CLI tool against your source code directory. The output will be saved to a `docs/` folder by default.
-```bash
-python -m codedocai.cli --path ./your-project --model gemma3:1b
-```
+## Architecture
+For a detailed technical overview, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+For API signatures, see [API.md](./API.md).
 
-### 4. Continuous Integration
-You can integrate CodeDocAI into your CI/CD pipeline to keep your documentation in sync with your code.
-
-## 📖 Full Documentation
-For a deeper look into the system, refer to the following documents:
-
-- [**API Reference**](API.md) — Detailed function/class signatures and call chains.
-- [**Architecture Overview**](ARCHITECTURE.md) — Dependency graphs, execution flow, and project structure.
+---
+*Generated with ❤️ by CodeDocAI*

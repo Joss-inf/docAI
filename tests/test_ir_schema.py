@@ -1,7 +1,7 @@
 """Tests for IR schema and semantic enrichment."""
 
-from codedocai.semantic.enricher import enrich_file_ir
-from codedocai.semantic.ir_schema import (
+from src.semantic.enricher import enrich_file_ir
+from src.semantic.ir_schema import (
     FileIR,
     FunctionIR,
     Language,

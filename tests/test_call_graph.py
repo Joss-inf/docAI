@@ -1,7 +1,7 @@
 """Test Call Graph execution mapping."""
 
-from codedocai.graph.call_graph import build_call_graph
-from codedocai.semantic.ir_schema import ProjectIR, FileIR, FunctionIR
+from src.graph.call_graph import build_call_graph
+from src.semantic.ir_schema import ProjectIR, FileIR, FunctionIR
 
 def test_call_graph_resolution():
     project = ProjectIR(project_name="Test", root_path="/test")

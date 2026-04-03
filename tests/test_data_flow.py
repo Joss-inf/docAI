@@ -1,7 +1,7 @@
 """Test for Data Flow tracking (Reads, Writes, Purity)."""
 
-from codedocai.semantic.ir_schema import FunctionIR
-from codedocai.semantic.enricher import _enrich_data_flow
+from src.semantic.ir_schema import FunctionIR
+from src.semantic.enricher import _enrich_data_flow
 
 def test_data_flow_enrichment():
     # 1. Dirty function

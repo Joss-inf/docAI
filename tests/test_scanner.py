@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from codedocai.scanner.language_detect import Language, detect_language
+from src.scanner.language_detect import Language, detect_language
 
 
 def test_detect_language():

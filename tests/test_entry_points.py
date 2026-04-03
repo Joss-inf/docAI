@@ -1,8 +1,8 @@
 """Test Entry Point identification and DFS tree extraction."""
 
-from codedocai.semantic.entry_points import detect_entry_points
-from codedocai.graph.call_graph import build_call_graph
-from codedocai.semantic.ir_schema import ProjectIR, FileIR, FunctionIR
+from src.semantic.entry_points import detect_entry_points
+from src.graph.call_graph import build_call_graph
+from src.semantic.ir_schema import ProjectIR, FileIR, FunctionIR
 
 def test_detect_entry_points():
     project = ProjectIR(project_name="Test", root_path="/test")

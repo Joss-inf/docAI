@@ -1,10 +1,10 @@
 """Tests for graph builder and metrics."""
 
-from codedocai.graph.builder import build_dependency_graph
-from codedocai.graph.cycles import detect_cycles
-from codedocai.graph.metrics import compute_metrics, topological_order
-from codedocai.graph.call_graph import CallGraph
-from codedocai.semantic.ir_schema import FileIR, ImportIR, Language, ProjectIR
+from src.graph.builder import build_dependency_graph
+from src.graph.cycles import detect_cycles
+from src.graph.metrics import compute_metrics, topological_order
+from src.graph.call_graph import CallGraph
+from src.semantic.ir_schema import FileIR, ImportIR, Language, ProjectIR
 
 
 def test_graph_builder_and_metrics():
